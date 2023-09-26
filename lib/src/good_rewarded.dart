@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:andesgroup_common/common.dart';
 import 'package:flutter_good_ads/src/extensions.dart';
+import 'package:flutter_good_ads/src/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoodRewarded {
@@ -14,11 +14,13 @@ class GoodRewarded {
     required this.adUnitId,
     this.adRequest = const AdRequest(),
     this.interval = 60000,
+    this.enableLog= true,
   });
 
   final String adUnitId;
   final AdRequest adRequest;
   final int interval;
+  final bool enableLog;
 
   /// return [RewardedAd], or throw [LoadAdError] if error
   Future<RewardedAd> load() async {
@@ -30,25 +32,28 @@ class GoodRewarded {
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
             ad.fullScreenContentCallback = FullScreenContentCallback(
-              onAdShowedFullScreenContent: (RewardedAd ad) => debug('interstitial_showedFullScreenContent($adUnitId): ${ad.print()}'),
+              onAdShowedFullScreenContent: (RewardedAd ad) =>
+                  debug('interstitial_showedFullScreenContent($adUnitId): ${ad.print()}',enableLog: enableLog),
               onAdDismissedFullScreenContent: (RewardedAd ad) {
-                debug('interstitial_dismissedFullScreenContent($adUnitId): ${ad.print()}');
+                debug('interstitial_dismissedFullScreenContent($adUnitId): ${ad.print()}',enableLog: enableLog);
                 ad.dispose();
                 _instance.remove(adUnitId);
               },
               onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-                debug('interstitial_failedToShowFullScreenContent($adUnitId): ${ad.print()},Error: $error');
+                debug(
+                    'interstitial_failedToShowFullScreenContent($adUnitId): ${ad.print()},Error: $error',enableLog: enableLog);
                 ad.dispose();
                 _instance.remove(adUnitId);
               },
-              onAdImpression: (RewardedAd ad) => debug('interstitial_impression($adUnitId): ${ad.print()}'),
+              onAdImpression: (RewardedAd ad) =>
+                  debug('interstitial_impression($adUnitId): ${ad.print()}',enableLog: enableLog),
             );
             _instance[adUnitId] = ad;
-            debug('interstitial_loaded($adUnitId): ${ad.print()}');
+            debug('interstitial_loaded($adUnitId): ${ad.print()}',enableLog: enableLog);
             result.complete(ad);
           },
           onAdFailedToLoad: (LoadAdError error) {
-            debug('interstitial_failedToLoaded($adUnitId): ${error.toString()}');
+            debug('interstitial_failedToLoaded($adUnitId): ${error.toString()}',enableLog: enableLog);
             result.completeError(error);
           },
         ));

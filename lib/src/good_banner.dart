@@ -1,6 +1,6 @@
-import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_good_ads/src/extensions.dart';
+import 'package:flutter_good_ads/src/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoodBanner extends StatefulWidget {
@@ -13,12 +13,14 @@ class GoodBanner extends StatefulWidget {
     this.adRequest = const AdRequest(),
     this.adSize = AdSize.banner,
     this.interval = 60000,
+    this.enableLog = true,
   }) : super(key: key);
 
   final String adUnitId;
   final AdRequest adRequest;
   final AdSize adSize;
   final int interval;
+  final bool enableLog;
 
   @override
   State<GoodBanner> createState() => _GoodBannerState();
@@ -28,7 +30,7 @@ class _GoodBannerState extends State<GoodBanner> {
   late final BannerAdListener listener = BannerAdListener(
     // Called when an ad is successfully received.
     onAdLoaded: (Ad ad) {
-      debug('banner_loaded(${widget.adUnitId}): ${ad.responseInfo.toString()}');
+      debug('banner_loaded(${widget.adUnitId}): ${ad.responseInfo.toString()}',enableLog: widget.enableLog);
       GoodBanner.lastImpressions
           .set(widget.adUnitId, DateTime.now().millisecondsSinceEpoch);
     },
@@ -37,17 +39,17 @@ class _GoodBannerState extends State<GoodBanner> {
       // Dispose the ad here to free resources.
       ad.dispose();
       debug(
-          'banner_load_failed(${widget.adUnitId}): ${ad.responseInfo.toString()}, Error: ${error.toString()}');
+          'banner_load_failed(${widget.adUnitId}): ${ad.responseInfo.toString()}, Error: ${error.toString()}',enableLog: widget.enableLog);
     },
     // Called when an ad opens an overlay that covers the screen.
-    onAdOpened: (Ad ad) => debug(
-        'banner_opened(${widget.adUnitId}): ${ad.responseInfo.toString()}'),
+    onAdOpened: (Ad ad) =>
+        debug('banner_opened(${widget.adUnitId}): ${ad.responseInfo.toString()}',enableLog: widget.enableLog),
     // Called when an ad removes an overlay that covers the screen.
-    onAdClosed: (Ad ad) => debug(
-        'banner_closed(${widget.adUnitId}): ${ad.responseInfo.toString()}'),
+    onAdClosed: (Ad ad) =>
+        debug('banner_closed(${widget.adUnitId}): ${ad.responseInfo.toString()}',enableLog: widget.enableLog),
     // Called when an impression occurs on the ad.
-    onAdImpression: (Ad ad) => debug(
-        'banner_impression(${widget.adUnitId}): ${ad.responseInfo.toString()}'),
+    onAdImpression: (Ad ad) =>
+        debug('banner_impression(${widget.adUnitId}): ${ad.responseInfo.toString()}',enableLog: widget.enableLog),
   );
 
   late final BannerAd myBanner = BannerAd(

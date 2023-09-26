@@ -1,5 +1,5 @@
-import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_good_ads/src/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoodBannerAdaptiveAnchored extends StatefulWidget {
@@ -7,10 +7,12 @@ class GoodBannerAdaptiveAnchored extends StatefulWidget {
     Key? key,
     required this.adUnitId,
     this.adRequest = const AdRequest(),
+    this.enableLog = true,
   }) : super(key: key);
 
   final String adUnitId;
   final AdRequest adRequest;
+  final bool enableLog;
 
   @override
   State<GoodBannerAdaptiveAnchored> createState() =>
@@ -35,7 +37,7 @@ class _GoodBannerAdaptiveAnchoredState
             MediaQuery.of(context).size.width.truncate());
 
     if (size == null) {
-      debug('Unable to get height of anchored banner.');
+      debug('Unable to get height of anchored banner.',enableLog: widget.enableLog);
       return;
     }
 
@@ -45,7 +47,7 @@ class _GoodBannerAdaptiveAnchoredState
       request: widget.adRequest,
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
-          debug('$ad loaded: ${ad.responseInfo}');
+          debug('$ad loaded: ${ad.responseInfo}',enableLog: widget.enableLog);
           setState(() {
             // When the ad is loaded, get the ad size and use it to set
             // the height of the ad container.
@@ -54,7 +56,7 @@ class _GoodBannerAdaptiveAnchoredState
           });
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          debug('Anchored adaptive banner failedToLoad: $error');
+          debug('Anchored adaptive banner failedToLoad: $error',enableLog: widget.enableLog);
           ad.dispose();
         },
       ),

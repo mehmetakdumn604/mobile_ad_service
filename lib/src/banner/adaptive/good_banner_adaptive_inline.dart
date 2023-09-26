@@ -1,5 +1,5 @@
-import 'package:andesgroup_common/common.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_good_ads/src/helpers.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GoodBannerAdaptiveInline extends StatefulWidget {
@@ -8,11 +8,13 @@ class GoodBannerAdaptiveInline extends StatefulWidget {
     required this.adUnitId,
     this.adRequest = const AdRequest(),
     this.adWidth,
+    this.enableLog = true,
   }) : super(key: key);
 
   final String adUnitId;
   final AdRequest adRequest;
   final double? adWidth;
+  final bool enableLog;
 
   @override
   State<GoodBannerAdaptiveInline> createState() =>
@@ -57,7 +59,7 @@ class _GoodBannerAdaptiveInlineState extends State<GoodBannerAdaptiveInline> {
       request: widget.adRequest,
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) async {
-          debug('Inline adaptive banner loaded: ${ad.responseInfo}');
+          debug('Inline adaptive banner loaded: ${ad.responseInfo}', enableLog: widget.enableLog);
 
           // After the ad is loaded, get the platform ad size and use it to
           // update the height of the container. This is necessary because the
@@ -65,7 +67,7 @@ class _GoodBannerAdaptiveInlineState extends State<GoodBannerAdaptiveInline> {
           BannerAd bannerAd = (ad as BannerAd);
           final AdSize? size = await bannerAd.getPlatformAdSize();
           if (size == null) {
-            debug('Error: getPlatformAdSize() returned null for $bannerAd');
+            debug('Error: getPlatformAdSize() returned null for $bannerAd', enableLog: widget.enableLog);
             return;
           }
 
@@ -76,7 +78,7 @@ class _GoodBannerAdaptiveInlineState extends State<GoodBannerAdaptiveInline> {
           });
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          debug('Inline adaptive banner failedToLoad: $error');
+          debug('Inline adaptive banner failedToLoad: $error', enableLog: widget.enableLog);
           ad.dispose();
         },
       ),
