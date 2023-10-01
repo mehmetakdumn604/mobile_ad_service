@@ -79,6 +79,7 @@ class GoodInterstitial {
       if (reloadAfterShow) {
         load();
       }
+      onDismissedAd?.call();
       return;
     }
     if (DateTime.now().millisecondsSinceEpoch - lastImpressions.get(adUnitId) > _interval.get(adUnitId)) {
