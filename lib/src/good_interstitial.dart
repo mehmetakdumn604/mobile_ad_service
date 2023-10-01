@@ -72,6 +72,7 @@ class GoodInterstitial {
   /// you after show. default: true
   Future<void> show({
     bool reloadAfterShow = true,
+    void Function()? onDismissedAd,
   }) async {
     // Ad instance of adUnitId has loaded fail or already showed.
     if (_instance[adUnitId] == null) {
@@ -80,9 +81,14 @@ class GoodInterstitial {
       }
       return;
     }
-    if (DateTime.now().millisecondsSinceEpoch - lastImpressions.get(adUnitId) >
-        _interval.get(adUnitId)) {
-      await _instance[adUnitId]!.show();
+    if (DateTime.now().millisecondsSinceEpoch - lastImpressions.get(adUnitId) > _interval.get(adUnitId)) {
+      _instance[adUnitId]!
+        ..fullScreenContentCallback = FullScreenContentCallback(
+          onAdDismissedFullScreenContent: (ad) => onDismissedAd?.call(),
+          onAdFailedToShowFullScreenContent: (ad, error) => onDismissedAd?.call(),
+          onAdWillDismissFullScreenContent: (ad) => onDismissedAd?.call(),
+        )
+        ..show();
       lastImpressions.set(adUnitId, DateTime.now().millisecondsSinceEpoch);
       if (reloadAfterShow) {
         load();
